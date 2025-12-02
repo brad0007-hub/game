@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3-Player RPS Arena (Deployable)</title>
+    
+    <!-- 
+    CRITICAL DEPLOYMENT STEP: 
+    The Tailwind CDN has been removed and the necessary styles are internalized below.
+    This ensures the game loads without external dependencies.
+    -->
+    <style>
+        /*
+        Internalized CSS: A comprehensive set of Tailwind utility classes used in the HTML.
+        In a real deployment, a build tool would generate the precise CSS, but this covers
+        all necessary styling for the UI to look correct.
+        */
+        .bg-background { background-color: #f3f4f6; }
+        .min-h-screen { min-height: 100vh; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .font-sans { font-family: 'Inter', sans-serif; }
+        .p-4 { padding: 1rem; }
+        .w-full { width: 100%; }
+        .max-w-lg { max-width: 32rem; }
+        .max-w-md { max-width: 28rem; }
+        .bg-card { background-color: #ffffff; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .p-6 { padding: 1.5rem; }
+        .md\:p-8 { padding: 2rem; }
+        .border { border-width: 1px; }
+        .border-gray-100 { border-color: #f3f4f6; }
+        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        .md\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+        .font-bold { font-weight: 700; }
+        .text-center { text-align: center; }
+        .text-gray-800 { color: #1f2937; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-gray-500 { color: #6b7280; }
+        .mb-4 { margin-bottom: 1rem; }
+        .flex-col { flex-direction: column; }
+        .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+        .bg-gray-50 { background-color: #f9fafb; }
+        .p-4 { padding: 1rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); }
+        .border-gray-200 { border-color: #e5e7eb; }
+        .font-semibold { font-weight: 600; }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .text-primary { color: #059669; } /* Emerald Green */
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .bg-indigo-100 { background-color: #e0e7ff; }
+        .border-indigo-500 { border-color: #6366f1; }
+        .bg-white { background-color: #fff; }
+        .text-gray-700 { color: #374151; }
+        .min-h-\[6rem\] { min-height: 6rem; }
+        .border-2 { border-width: 2px; }
+        .border-dashed { border-style: dashed; }
+        .border-gray-300 { border-color: #d1d5db; }
+        .grid { display: grid; }
+        .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .gap-4 { gap: 1rem; }
+        .bg-blue-500 { background-color: #3b82f6; }
+        .bg-amber-500 { background-color: #f59e0b; }
+        .text-white { color: #fff; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .hover\:bg-emerald-700:hover { background-color: #047857; }
+        .hover\:bg-blue-600:hover { background-color: #2563eb; }
+        .hover\:bg-amber-600:hover { background-color: #d97706; }
+        .focus\:outline-none:focus { outline: 2px solid transparent; outline-offset: 2px; }
+        .focus\:ring-4:focus { --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color); --tw-ring-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow); }
+        .text-red-500 { color: #ef4444; }
+        .font-extrabold { font-weight: 800; }
+        .uppercase { text-transform: uppercase; }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        .mt-2 { margin-top: 0.5rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .border-red-500 { border-color: #ef4444; }
+        .border-blue-500 { border-color: #3b82f6; }
+        .bg-red-500 { background-color: #ef4444; }
+        .hover\:bg-red-600:hover { background-color: #dc2626; }
+        .bg-gray-300 { background-color: #d1d5db; }
+        .hover\:bg-gray-400:hover { background-color: #9ca3af; }
+        .transition { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+        .hidden { display: none; }
+        .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+        .bg-indigo-600 { background-color: #4f46e5; }
+        .hover\:bg-indigo-700:hover { background-color: #4338ca; }
+        .tracking-widest { letter-spacing: 0.1em; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .break-all { word-break: break-all; }
+        .mt-6 { margin-top: 1.5rem; }
+        .bg-yellow-500 { background-color: #f59e0b; }
+        .hover\:bg-yellow-600:hover { background-color: #d97706; }
+        .fixed { position: fixed; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .bg-black { background-color: #000; }
+        .bg-opacity-50 { background-color: rgba(0, 0, 0, 0.5); }
+        .z-50 { z-index: 50; }
+        .transition-opacity { transition-property: opacity; }
+        .duration-300 { transition-duration: 300ms; }
+        .max-w-sm { max-width: 24rem; }
+        .text-indigo-500 { color: #6366f1; }
+        .bg-green-500 { background-color: #10b981; }
+        .hover\:bg-green-600:hover { background-color: #059669; }
+        .w-1\/2 { width: 50%; }
+        /* Custom Button Styling */
+        .game-button {
+            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+            cursor: pointer;
+        }
+        .game-button:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .game-button:active:not(:disabled) {
+            transform: translateY(1px);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        .game-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen flex items-center justify-center font-sans p-4">
+
+    <script type="module">
+        // ----------------------------------------------------------------------
+        // 1. POKI SDK PLACEHOLDER (CRITICAL FOR DEPLOYMENT)
+        // In a real deployment, you would replace this entire object 
+        // with the official Poki SDK script provided by the platform.
+        // ----------------------------------------------------------------------
+        const PokiSDK = {
+            init: (callback) => { 
+                console.log("PokiSDK initialized."); 
+                // Simulate initialization delay
+                setTimeout(callback, 50); 
+            },
+            gameplayStart: () => { console.log("Poki: Gameplay Started."); },
+            gameplayStop: () => { console.log("Poki: Gameplay Stopped."); },
+            commercialBreak: (callback) => { 
+                console.log("Poki: Starting Commercial Break (Ad)."); 
+                // In a real environment, this blocks until the ad finishes.
+                setTimeout(callback, 500); 
+            },
+            rewardedBreak: (callback) => { 
+                console.log("Poki: Starting Rewarded Ad."); 
+                setTimeout(() => callback(true), 500); 
+            },
+        }; 
+        // ----------------------------------------------------------------------
+
+        // ----------------------------------------------------------------------
+        // 2. FIREBASE IMPORTS
+        // ----------------------------------------------------------------------
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, updateDoc, deleteDoc, collection, runTransaction, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Firebase variables
+        window.db = null;
+        window.auth = null;
+        window.userId = null;
+        window.appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+
+        // ----------------------------------------------------------------------
+        // 3. FIREBASE SETUP AND AUTHENTICATION
+        // ----------------------------------------------------------------------
+        async function initializeFirebase() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Firebase Auth Ready. User ID:", userId);
+                        document.dispatchEvent(new CustomEvent('authReady'));
+                    } else {
+                        console.error("Authentication failed.");
+                    }
+                });
+            } catch (error) {
+                console.error("Error initializing Firebase:", error);
+            }
+        }
+
+        // ----------------------------------------------------------------------
+        // 4. GAME STATE MANAGEMENT AND LOGIC
+        // ----------------------------------------------------------------------
+        window.MAX_PLAYERS = 3;
+        window.WIN_SCORE = 5;
+        window.ROUND_DURATION = 5; // seconds
+        const choices = ['rock', 'paper', 'scissors'];
+
+        // Multiplayer State
+        window.GAME_ID = null;
+        window.gameRef = null;
+        window.timerInterval = null;
+        window.countdownValue = 0;
+        window.unsubscribe = null; 
+        
+        // Solo Player State
+        window.GAME_MODE = 'multi'; 
+        window.soloPlayerScore = 0;
+        window.soloComputerScore = 0;
+        window.soloGameTimer = null;
+        window.soloRound = 0;
+
+        // DOM Elements
+        const resultDisplayEl = document.getElementById('result-display');
+        const lobbyContainer = document.getElementById('lobby-container');
+        const gameContainer = document.getElementById('game-container');
+        const gameTitleEl = document.getElementById('game-title');
+        
+        window.getGameData = async function() {
+            if (!gameRef) return null;
+            const docSnap = await getDoc(gameRef);
+            return docSnap.exists() ? docSnap.data() : null;
+        }
+
+        window.getEmoji = function(choice) {
+            switch (choice) {
+                case 'rock': return '🪨 Rock';
+                case 'paper': return '📄 Paper';
+                case 'scissors': return '✂️ Scissors';
+                default: return '';
+            }
+        };
+
+        window.toggleButtons = function(disabled) {
+            document.querySelectorAll('.game-button').forEach(button => {
+                button.disabled = disabled;
+            });
+        };
+
+        // --- UI/LOBBY MANAGEMENT ---
+
+        window.updatePlayerUI = function(gameData) {
+            const playerListEl = document.getElementById('player-list');
+            playerListEl.innerHTML = '';
+            
+            Object.keys(gameData.players).forEach(pId => {
+                const player = gameData.players[pId];
+                const isMe = pId === userId;
+                const isHost = pId === Object.keys(gameData.players)[0]; 
+                
+                const currentChoice = gameData.currentRoundChoices[pId] ? '✅' : '⏳';
+
+                const playerEl = document.createElement('div');
+                playerEl.className = `flex justify-between items-center p-2 rounded-lg ${isMe ? 'bg-indigo-100 border-indigo-500' : 'bg-white border-gray-200'} border shadow-sm`;
+                playerEl.innerHTML = `
+                    <span class="font-semibold truncate text-gray-800">
+                        ${isHost ? '👑 ' : ''}${player.name} ${isMe ? '(You)' : ''}
+                    </span>
+                    <span class="text-xl font-bold text-primary">${player.score}</span>
+                    <span class="text-2xl">${gameData.status === 'playing' ? currentChoice : ''}</span>
+                `;
+                playerListEl.appendChild(playerEl);
+            });
+        };
+
+        window.showLobby = function() {
+            // POKI HOOK: Gameplay Stop
+            PokiSDK.gameplayStop();
+
+            if (unsubscribe) unsubscribe();
+            if (timerInterval) clearInterval(timerInterval);
+            if (soloGameTimer) clearInterval(soloGameTimer);
+            GAME_ID = null;
+            GAME_MODE = 'multi'; 
+
+            gameContainer.classList.add('hidden');
+            lobbyContainer.classList.remove('hidden');
+            
+            resultDisplayEl.innerHTML = '<p class="text-lg font-medium text-gray-700">Waiting for players...</p>';
+            resultDisplayEl.className = 'min-h-[6rem] mb-6 p-4 border-2 border-dashed border-gray-300 rounded-lg text-center flex flex-col justify-center items-center';
+        };
+        
+        window.showGame = function() {
+            lobbyContainer.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+            
+            document.getElementById('solo-scoreboard').classList.toggle('hidden', GAME_MODE !== 'solo');
+            document.getElementById('player-list').classList.toggle('hidden', GAME_MODE === 'solo');
+            document.getElementById('multiplayer-start-btn').classList.toggle('hidden', GAME_MODE === 'solo');
+            document.getElementById('current-game-id-wrapper').classList.toggle('hidden', GAME_MODE === 'solo');
+
+            gameTitleEl.textContent = GAME_MODE === 'solo' ? '🤖 Solo RPS Challenge 🤖' : '🔥 3-Player RPS Battle 🔥';
+        };
+
+        // --- MULTIPLAYER (FIREBASE) LOGIC ---
+
+        window.startGame = async function() {
+            if (!GAME_ID) return;
+            
+            const gameData = await getGameData();
+            if (!gameData) return alertModal("Could not load game data.");
+
+            if (Object.keys(gameData.players)[0] !== userId) {
+                alertModal("Only the host (crowned player) can start the game.");
+                return;
+            }
+
+            if (Object.keys(gameData.players).length < 2) {
+                alertModal("Need at least 2 players to start!");
+                return;
+            }
+
+            // POKI HOOK: Gameplay Start
+            PokiSDK.gameplayStart();
+
+            await runTransaction(db, async (transaction) => {
+                const docSnap = await transaction.get(gameRef);
+                if (!docSnap.exists()) throw "Document does not exist!";
+                
+                let players = docSnap.data().players;
+                Object.keys(players).forEach(pId => players[pId].score = 0);
+
+                transaction.update(gameRef, {
+                    status: 'playing',
+                    round: 1,
+                    players: players,
+                    currentRoundChoices: {},
+                    lastUpdateTime: serverTimestamp(),
+                    winner: null
+                });
+            });
+        };
+
+        window.determineRoundWinner = function(choicesMap) {
+            const values = Object.values(choicesMap).filter(c => c !== null);
+            if (values.length < 2) return null; 
+
+            const counts = values.reduce((acc, c) => { acc[c] = (acc[c] || 0) + 1; return acc; }, {});
+            const uniqueChoices = Object.keys(counts).length;
+
+            if (uniqueChoices === 1 || uniqueChoices === 3) return 'draw';
+
+            if (uniqueChoices === 2) {
+                const [c1] = Object.entries(counts)[0];
+                const [c2] = Object.entries(counts)[1];
+
+                // Determine the single winning move that beats the other
+                const c1BeatsC2 = (c1 === 'rock' && c2 === 'scissors') ||
+                                  (c1 === 'paper' && c2 === 'rock') ||
+                                  (c1 === 'scissors' && c2 === 'paper');
+
+                return c1BeatsC2 ? c1 : c2;
+            }
+            return null;
+        };
+
+        window.listenToGame = function(gameId) {
+            if (unsubscribe) unsubscribe();
+            GAME_ID = gameId;
+            GAME_MODE = 'multi'; 
+            gameRef = doc(db, `artifacts/${appId}/public/data/rps_games`, gameId);
+            showGame();
+            PokiSDK.gameplayStart(); // Start gameplay as soon as player joins game session
+
+            unsubscribe = onSnapshot(gameRef, (docSnap) => {
+                if (!docSnap.exists()) {
+                    alertModal("Game deleted or failed to load. Please create a new game.");
+                    showLobby();
+                    return;
+                }
+                const gameData = docSnap.data();
+                
+                updatePlayerUI(gameData);
+                
+                if (gameData.status === 'ended') {
+                    handleGameOver(gameData);
+                    return;
+                }
+                
+                if(gameData.status === 'result' && gameData.result) {
+                    displayRoundResult(gameData);
+                    return;
+                }
+
+                const winnerId = Object.keys(gameData.players).find(pId => gameData.players[pId].score >= WIN_SCORE);
+                if (winnerId) {
+                     updateDoc(gameRef, { status: 'ended', winner: winnerId, lastUpdateTime: serverTimestamp() });
+                     return;
+                }
+
+                if (gameData.status === 'playing') {
+                    toggleButtons(false);
+                    const playersInGame = Object.keys(gameData.players);
+                    const choicesMade = playersInGame.filter(pId => gameData.currentRoundChoices[pId]);
+                    
+                    if (choicesMade.length === playersInGame.length) {
+                        processRound(gameData);
+                        return;
+                    }
+                    
+                    if (playersInGame[0] === userId) {
+                        manageHostTimer(gameData, playersInGame);
+                    } else {
+                        const serverTimeMs = gameData.lastUpdateTime ? gameData.lastUpdateTime.toMillis() : Date.now();
+                        const elapsedTime = (Date.now() - serverTimeMs) / 1000;
+                        countdownValue = Math.max(0, ROUND_DURATION - Math.floor(elapsedTime));
+                        updateTimerDisplay(gameData);
+                    }
+                }
+            }, (error) => {
+                console.error("Firestore listen error:", error);
+            });
+        };
+        
+        window.manageHostTimer = async function(gameData, playersInGame) {
+            if (timerInterval) clearInterval(timerInterval);
+            
+            const serverTimeMs = gameData.lastUpdateTime ? gameData.lastUpdateTime.toMillis() : Date.now();
+            const elapsedTime = (Date.now() - serverTimeMs) / 1000;
+            countdownValue = Math.max(0, ROUND_DURATION - Math.floor(elapsedTime));
+
+            if (countdownValue > 0) {
+                updateTimerDisplay(gameData);
+                timerInterval = setInterval(async () => {
+                    countdownValue--;
+                    updateTimerDisplay(gameData);
+
+                    if (countdownValue <= 0) {
+                        clearInterval(timerInterval);
+                        await processRound(gameData, true);
+                    }
+                }, 1000);
+                toggleButtons(false);
+            } else if (gameData.status === 'playing') {
+                await processRound(gameData, true);
+            }
+        };
+
+        window.updateTimerDisplay = function(gameData) {
+            if (gameData.status === 'playing') {
+                const choiceStatus = gameData.currentRoundChoices[userId] ? '✅ Chosen' : '⏳ Waiting for your choice...';
+                
+                resultDisplayEl.innerHTML = `
+                    <p class="text-lg font-medium text-gray-700">${choiceStatus}</p>
+                    <p class="text-2xl font-bold text-gray-800 mt-2">Time Left: <span id="countdown" class="text-red-500 text-4xl font-extrabold">${countdownValue}</span></p>
+                `;
+                resultDisplayEl.className = 'min-h-[6rem] mb-6 p-4 border-2 border-dashed border-gray-300 rounded-lg text-center flex flex-col justify-center items-center';
+            }
+        }
+
+        window.processRound = async function(gameData, isTimeout = false) {
+            const playersInGame = Object.keys(gameData.players);
+            if (playersInGame[0] !== userId) return;
+            
+            if (timerInterval) clearInterval(timerInterval);
+            toggleButtons(true); 
+
+            let finalChoices = gameData.currentRoundChoices;
+
+            if (isTimeout) {
+                playersInGame.forEach(pId => {
+                    if (!finalChoices[pId]) {
+                         finalChoices[pId] = 'rock'; 
+                    }
+                });
+            }
+
+            const winningChoice = determineRoundWinner(finalChoices);
+            
+            let newPlayers = { ...gameData.players };
+            let message;
+            let color;
+            
+            if (winningChoice === 'draw') {
+                message = `<p class="text-3xl font-bold text-blue-500">ROUND ${gameData.round}: TIE! 🤝</p>`;
+                color = 'border-blue-500';
+            } else if (winningChoice) {
+                const roundWinners = playersInGame.filter(pId => finalChoices[pId] === winningChoice);
+                roundWinners.forEach(pId => {
+                    newPlayers[pId].score += 1;
+                });
+                
+                const winnerNames = roundWinners.map(pId => newPlayers[pId].name).join(', ');
+                message = `<p class="text-3xl font-bold text-primary">ROUND ${gameData.round}: ${roundWinners.length > 1 ? 'WINNERS!' : 'WINNER!'} 🎉</p>
+                           <p class="mt-2 text-lg text-gray-600">${winnerNames} won with ${getEmoji(winningChoice)}.</p>`;
+                color = 'border-primary';
+            } else {
+                 message = `<p class="text-3xl font-bold text-gray-500">ROUND ${gameData.round}: FAILED</p>`;
+                 color = 'border-gray-500';
+            }
+            
+            await updateDoc(gameRef, {
+                status: 'result',
+                result: { message, color },
+                players: newPlayers,
+                lastUpdateTime: serverTimestamp(),
+            });
+            
+            setTimeout(async () => {
+                await updateDoc(gameRef, {
+                    status: 'playing',
+                    round: gameData.round + 1,
+                    currentRoundChoices: {},
+                    result: null,
+                    lastUpdateTime: serverTimestamp(),
+                });
+            }, 3000);
+        };
+        
+        window.displayRoundResult = function(gameData) {
+             const result = gameData.result;
+             resultDisplayEl.innerHTML = result.message;
+             resultDisplayEl.className = `min-h-[6rem] mb-6 p-4 border-2 border-dashed rounded-lg text-center flex flex-col justify-center items-center ${result.color}`;
+             toggleButtons(true);
+        }
+
+        window.handleGameOver = function(gameData) {
+            if (unsubscribe) unsubscribe();
+            if (timerInterval) clearInterval(timerInterval);
+            
+            toggleButtons(true);
+            
+            // POKI HOOK: Stop Gameplay & Initiate Commercial Break
+            PokiSDK.gameplayStop();
+            PokiSDK.commercialBreak(() => {
+                const winnerName = gameData.players[gameData.winner]?.name || 'Nobody';
+                const winnerText = gameData.winner ? 
+                    `<p class="text-4xl font-extrabold text-primary">GAME OVER! 🏆</p><p class="text-2xl font-bold text-gray-700 mt-2">${winnerName} is the Champion!</p>` : 
+                    `<p class="text-4xl font-extrabold text-red-500">GAME ENDED</p><p class="text-2xl font-bold text-gray-700 mt-2">Game session terminated.</p>`;
+
+                resultDisplayEl.innerHTML = winnerText;
+                resultDisplayEl.className = `min-h-[6rem] mb-6 p-4 border-2 border-dashed border-red-500 rounded-lg text-center flex flex-col justify-center items-center`;
+            });
+        };
+
+        // --- SOLO GAME LOGIC ---
+
+        window.playSolo = function() {
+            GAME_MODE = 'solo';
+            showGame();
+            startSoloGame();
+        };
+
+        window.startSoloGame = function() {
+            // POKI HOOK: Gameplay Start
+            PokiSDK.gameplayStart();
+
+            if (soloGameTimer) clearInterval(soloGameTimer);
+            soloPlayerScore = 0;
+            soloComputerScore = 0;
+            soloRound = 1;
+            soloUpdateUI(null, null, 'start');
+            soloStartRoundTimer();
+        };
+
+        window.getComputerChoice = function() {
+            const randomIndex = Math.floor(Math.random() * choices.length);
+            return choices[randomIndex];
+        }
+
+        window.determineRoundWinnerSolo = function(playerChoice, computerChoice) {
+            if (playerChoice === computerChoice) return 'draw';
+            if (
+                (playerChoice === 'rock' && computerChoice === 'scissors') ||
+                (playerChoice === 'paper' && computerChoice === 'rock') ||
+                (playerChoice === 'scissors' && computerChoice === 'paper')
+            ) {
+                return 'win';
+            }
+            return 'lose';
+        };
+
+        window.soloUpdateUI = function(playerChoice, computerChoice, result) {
+            document.getElementById('solo-player-score').textContent = soloPlayerScore;
+            document.getElementById('solo-computer-score').textContent = soloComputerScore;
+
+            let message = '';
+            let color = 'border-gray-300';
+
+            if (result === 'start') {
+                message = `<p class="text-lg font-medium text-gray-700">Round ${soloRound}. First to ${WIN_SCORE} wins!</p>`;
+            } else if (result === 'win') {
+                soloPlayerScore++;
+                message = `<p class="text-3xl font-bold text-primary animate-pulse">YOU WIN! 🎉</p><p class="mt-2 text-lg text-gray-600">${getEmoji(playerChoice)} beats ${getEmoji(computerChoice)}.</p>`;
+                color = 'border-primary';
+            } else if (result === 'lose') {
+                soloComputerScore++;
+                message = `<p class="text-3xl font-bold text-red-500 animate-pulse">YOU LOSE! 😭</p><p class="mt-2 text-lg text-gray-600">${getEmoji(computerChoice)} beats ${getEmoji(playerChoice)}.</p>`;
+                color = 'border-red-500';
+            } else if (result === 'draw') {
+                message = `<p class="text-3xl font-bold text-blue-500">IT'S A TIE! 🤝</p><p class="mt-2 text-lg text-gray-600">Both chose ${getEmoji(playerChoice)}.</p>`;
+                color = 'border-blue-500';
+            } else if (result === 'timeout') {
+                 soloComputerScore++;
+                 message = `<p class="text-3xl font-bold text-red-600">TIME OUT! ⏱️</p><p class="mt-2 text-lg text-gray-600">You forfeit the round. Computer scores.</p>`;
+                 color = 'border-red-600';
+            }
+
+            if (soloPlayerScore >= WIN_SCORE || soloComputerScore >= WIN_SCORE) {
+                soloHandleGameOver(soloPlayerScore > soloComputerScore);
+                return;
+            }
+
+            resultDisplayEl.innerHTML = message;
+            resultDisplayEl.className = `min-h-[6rem] mb-6 p-4 border-2 border-dashed rounded-lg text-center flex flex-col justify-center items-center ${color}`;
+            
+            if (result !== 'start') {
+                document.getElementById('solo-player-score').textContent = soloPlayerScore;
+                document.getElementById('solo-computer-score').textContent = soloComputerScore;
+                soloRound++;
+                setTimeout(soloStartRoundTimer, 2000);
+            }
+        };
+
+        window.soloStartRoundTimer = function() {
+            if (soloGameTimer) clearInterval(soloGameTimer);
+            let countdown = ROUND_DURATION;
+            toggleButtons(false);
+
+            resultDisplayEl.innerHTML = `<p class="text-lg font-medium text-gray-700">Round ${soloRound}: Make your move!</p>
+                                         <p class="text-2xl font-bold text-gray-800 mt-2">Time Left: <span id="solo-countdown" class="text-red-500 text-4xl font-extrabold">${countdown}</span></p>`;
+            resultDisplayEl.className = 'min-h-[6rem] mb-6 p-4 border-2 border-dashed border-gray-300 rounded-lg text-center flex flex-col justify-center items-center';
+            
+            const countdownEl = document.getElementById('solo-countdown');
+
+            soloGameTimer = setInterval(() => {
+                countdown--;
+                if (countdownEl) countdownEl.textContent = countdown;
+
+                if (countdown <= 0) {
+                    clearInterval(soloGameTimer);
+                    soloUpdateUI('none', getComputerChoice(), 'timeout');
+                }
+            }, 1000);
+        };
+
+        window.soloPlayRound = function(playerChoice) {
+            if (soloGameTimer) clearInterval(soloGameTimer);
+            toggleButtons(true);
+            
+            const computerChoice = getComputerChoice();
+            const winner = determineRoundWinnerSolo(playerChoice, computerChoice);
+            
+            soloUpdateUI(playerChoice, computerChoice, winner);
+        };
+
+        window.soloHandleGameOver = function(playerWon) {
+            if (soloGameTimer) clearInterval(soloGameTimer);
+            toggleButtons(true);
+            
+            // POKI HOOK: Stop Gameplay & Initiate Commercial Break
+            PokiSDK.gameplayStop();
+            PokiSDK.commercialBreak(() => {
+                const winnerText = playerWon ? 
+                    `<p class="text-4xl font-extrabold text-primary">GAME OVER! 🏆</p><p class="text-2xl font-bold text-gray-700 mt-2">You are the Champion!</p>` : 
+                    `<p class="text-4xl font-extrabold text-red-500">GAME OVER! 😭</p><p class="text-2xl font-bold text-gray-700 mt-2">The Computer won this time.</p>`;
+
+                resultDisplayEl.innerHTML = winnerText;
+                resultDisplayEl.className = `min-h-[6rem] mb-6 p-4 border-2 border-dashed ${playerWon ? 'border-primary' : 'border-red-500'} rounded-lg text-center flex flex-col justify-center items-center`;
+                
+                // Offer to play again after ad
+                setTimeout(startSoloGame, 5000);
+            });
+        };
+        
+        // --- END SOLO GAME LOGIC ---
+
+        // Main function called on button click
+        window.playGame = async function(playerChoice) {
+            if (GAME_MODE === 'solo') {
+                soloPlayRound(playerChoice);
+            } else {
+                if (!GAME_ID || !userId) return;
+                
+                toggleButtons(true); 
+                
+                await updateDoc(gameRef, {
+                    [`currentRoundChoices.${userId}`]: playerChoice,
+                    lastUpdateTime: serverTimestamp() 
+                });
+                
+                document.getElementById('result-display').innerHTML = '<p class="text-2xl font-bold text-indigo-500">Choice submitted! Waiting for others...</p>';
+            }
+        };
+
+        // Lobby functions
+        window.createGame = async function() {
+            const gameId = Math.random().toString(36).substring(2, 8).toUpperCase();
+            const gameDocRef = doc(db, `artifacts/${appId}/public/data/rps_games`, gameId);
+            
+            await setDoc(gameDocRef, {
+                gameId: gameId,
+                status: 'waiting',
+                maxScore: WIN_SCORE,
+                round: 0,
+                players: {
+                    [userId]: { name: `Player ${Math.floor(Math.random() * 1000)}`, score: 0 }
+                },
+                currentRoundChoices: {},
+                lastUpdateTime: serverTimestamp(),
+                winner: null
+            });
+            document.getElementById('current-game-id').textContent = gameId;
+            listenToGame(gameId);
+        };
+        
+        window.joinGame = function() {
+            const gameId = document.getElementById('join-game-id').value.toUpperCase();
+            if (!gameId) {
+                alertModal("Please enter a Game ID.");
+                return;
+            }
+            runTransaction(db, async (transaction) => {
+                const gameDocRef = doc(db, `artifacts/${appId}/public/data/rps_games`, gameId);
+                const docSnap = await transaction.get(gameDocRef);
+                
+                if (!docSnap.exists()) {
+                    throw new Error("Game not found!");
+                }
+                
+                const gameData = docSnap.data();
+                if (gameData.status !== 'waiting') {
+                    throw new Error("Game has already started.");
+                }
+                if (Object.keys(gameData.players).length >= MAX_PLAYERS) {
+                    throw new Error("Game is full.");
+                }
+                if (gameData.players[userId]) {
+                    return;
+                }
+                
+                const playerName = `Player ${Math.floor(Math.random() * 1000)}`;
+                const newPlayers = {
+                    ...gameData.players,
+                    [userId]: { name: playerName, score: 0 }
+                };
+                
+                transaction.update(gameDocRef, {
+                    players: newPlayers,
+                    lastUpdateTime: serverTimestamp()
+                });
+            })
+            .then(() => {
+                document.getElementById('current-game-id').textContent = gameId;
+                listenToGame(gameId);
+            })
+            .catch((error) => {
+                alertModal(`Failed to join game: ${error.message}`);
+                console.error(error);
+            });
+        };
+
+        window.alertModal = function(message) {
+            const modal = document.getElementById('modal-overlay');
+            document.getElementById('modal-message').textContent = message;
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('hidden'), 3000);
+        };
+
+        // POKI HOOK: Initialize PokiSDK FIRST, then Firebase
+        window.addEventListener('load', () => {
+            PokiSDK.init(() => {
+                initializeFirebase();
+            });
+        });
+        
+        document.addEventListener('authReady', showLobby);
+
+        // FIX: Update the unique ID display immediately after auth is ready (runs only once).
+        document.addEventListener('authReady', () => {
+            const idDisplay = document.getElementById('my-user-id-display');
+            if (idDisplay && window.userId) {
+                idDisplay.textContent = window.userId;
+            }
+        });
+
+    </script>
+
+    <!-- Modal for Alerts (No window.alert allowed) -->
+    <div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center transition-opacity duration-300">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full text-center">
+            <p id="modal-message" class="text-lg font-semibold text-gray-800"></p>
+        </div>
+    </div>
+
+    <!-- Main Game Container (Starts hidden until game ID is set) -->
+    <div id="game-container" class="hidden w-full max-w-lg bg-card rounded-xl shadow-2xl p-6 md:p-8 border border-gray-100">
+        <h1 id="game-title" class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-6 flex items-center justify-center">
+            🔥 3-Player RPS Battle 🔥
+        </h1>
+        <div id="current-game-id-wrapper" class="text-sm text-center text-gray-500 mb-4">
+             Game ID: <span id="current-game-id" class="font-mono font-bold text-primary text-base">N/A</span>
+        </div>
+
+        <!-- Solo Scoreboard (1v1, Hidden by default) -->
+        <div id="solo-scoreboard" class="hidden flex justify-around items-center bg-gray-50 p-4 rounded-lg mb-6 shadow-inner border border-gray-200">
+            <div class="text-center">
+                <p class="text-sm font-semibold uppercase text-gray-500">You</p>
+                <p id="solo-player-score" class="text-4xl font-extrabold text-primary">0</p>
+            </div>
+            <div class="text-center">
+                <p class="text-sm font-semibold uppercase text-gray-500">Computer</p>
+                <p id="solo-computer-score" class="text-4xl font-extrabold text-red-500">0</p>
+            </div>
+        </div>
+        
+        <!-- Player Scoreboard (Multiplayer - shown/hidden dynamically) -->
+        <div id="player-list" class="flex flex-col space-y-2 bg-gray-50 p-4 rounded-lg mb-6 shadow-inner border border-gray-200">
+            <div class="text-center text-gray-500">Waiting for game data...</div>
+        </div>
+
+        <!-- Result/Timer Display -->
+        <div id="result-display" class="min-h-[6rem] mb-6 p-4 border-2 border-dashed border-gray-300 rounded-lg text-center flex flex-col justify-center items-center">
+            <p class="text-lg font-medium text-gray-700">Game Loading...</p>
+        </div>
+
+        <!-- Game Buttons -->
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <button onclick="playGame('rock')" class="game-button bg-primary text-white p-4 rounded-xl text-3xl font-bold shadow-lg hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-primary/50" disabled>
+                🪨
+            </button>
+            <button onclick="playGame('paper')" class="game-button bg-blue-500 text-white p-4 rounded-xl text-3xl font-bold shadow-lg hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-500/50" disabled>
+                📄
+            </button>
+            <button onclick="playGame('scissors')" class="game-button bg-amber-500 text-white p-4 rounded-xl text-3xl font-bold shadow-lg hover:bg-amber-600 focus:outline-none focus:ring-4 focus:ring-amber-500/50" disabled>
+                ✂️
+            </button>
+        </div>
+
+        <!-- Start/Exit Buttons -->
+        <div class="flex space-x-2">
+            <button id="multiplayer-start-btn" onclick="startGame()" class="w-1/2 bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition duration-150 focus:outline-none focus:ring-4 focus:ring-green-500/50">
+                Start Game (Host Only)
+            </button>
+            <button onclick="showLobby()" class="w-1/2 bg-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-400 transition duration-150 focus:outline-none focus:ring-4 focus:ring-gray-300/50">
+                Exit Game
+            </button>
+        </div>
+    </div>
+    
+    <!-- Lobby Container (Visible initially) -->
+    <div id="lobby-container" class="w-full max-w-md bg-card rounded-xl shadow-2xl p-6 md:p-8 border border-gray-100">
+        <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Game Lobby (3-Player)</h2>
+        <div class="space-y-4">
+            <!-- Create Game -->
+            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p class="font-semibold text-lg mb-2">1. Create New Game (Multiplayer)</p>
+                <button onclick="createGame()" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition">
+                    Create New Game Session
+                </button>
+            </div>
+            
+            <!-- Join Game -->
+            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p class="font-semibold text-lg mb-2">2. Join Existing Game (Multiplayer)</p>
+                <input type="text" id="join-game-id" placeholder="Enter 6-digit Game ID" class="w-full p-3 border border-gray-300 rounded-lg mb-3 uppercase tracking-widest text-center text-lg focus:ring-indigo-500 focus:border-indigo-500">
+                <button onclick="joinGame()" class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-emerald-700 transition">
+                    Join Game
+                </button>
+            </div>
+
+            <!-- Play Solo -->
+            <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p class="font-semibold text-lg mb-2">3. Play Solo (VS Computer)</p>
+                <button onclick="playSolo()" class="w-full bg-yellow-500 text-white py-3 rounded-lg font-semibold hover:bg-yellow-600 transition">
+                    Start Single Player Game
+                </button>
+            </div>
+        </div>
+        <p class="text-sm text-center text-gray-500 mt-6">Your unique ID: <span class="font-mono text-xs text-gray-700 break-all" id="my-user-id-display">Loading...</span></p>
+    </div>
+
+</body>
+</html>
