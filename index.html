@@ -13,8 +13,6 @@
     <style>
         /*
         Internalized CSS: A comprehensive set of Tailwind utility classes used in the HTML.
-        In a real deployment, a build tool would generate the precise CSS, but this covers
-        all necessary styling for the UI to look correct.
         */
         .bg-background { background-color: #f3f4f6; }
         .min-h-screen { min-height: 100vh; }
@@ -172,7 +170,7 @@
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
 
         // ----------------------------------------------------------------------
-        // 3. FIREBASE SETUP AND AUTHENTICATION
+        // 3. FIREBASE SETUP AND AUTHENTICATION (FIXED ASYNCHRONOUS FLOW)
         // ----------------------------------------------------------------------
         async function initializeFirebase() {
             try {
@@ -180,19 +178,27 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                if (typeof __initial_auth_token !== 'undefined') {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                onAuthStateChanged(auth, (user) => {
+                // Wait for auth to complete and get the user ID
+                onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
                         console.log("Firebase Auth Ready. User ID:", userId);
+                        
+                        // FIX: Update the unique ID display immediately after auth is ready
+                        const idDisplay = document.getElementById('my-user-id-display');
+                        if (idDisplay) {
+                            idDisplay.textContent = userId;
+                        }
+
+                        // Dispatch event to signal that game logic can now start
                         document.dispatchEvent(new CustomEvent('authReady'));
                     } else {
-                        console.error("Authentication failed.");
+                        // Attempt initial sign-in if not yet signed in (e.g., first load)
+                        if (typeof __initial_auth_token !== 'undefined') {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
                     }
                 });
             } catch (error) {
@@ -776,15 +782,8 @@
             });
         });
         
+        // Signal event for game initialization after Auth completes
         document.addEventListener('authReady', showLobby);
-
-        // FIX: Update the unique ID display immediately after auth is ready (runs only once).
-        document.addEventListener('authReady', () => {
-            const idDisplay = document.getElementById('my-user-id-display');
-            if (idDisplay && window.userId) {
-                idDisplay.textContent = window.userId;
-            }
-        });
 
     </script>
 
